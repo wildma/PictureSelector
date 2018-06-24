@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/dp_14"
+    android:layout_marginRight="@dimen/dp_14"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_select_picture_dialog_bg"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_camera"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_43"
+            android:background="@drawable/selector_select_picture_top_corners"
+            android:text="@string/select_picture_photograph"
+            android:textColor="@color/color_333333"
+            android:textSize="@dimen/sp_17"/>
+
+        <include layout="@layout/include_line_horizontal_05dp_f8f8f8"/>
+
+        <Button
+            android:id="@+id/btn_album"
+            android:layout_width="match_parent"
+            android:layout_height="43dp"
+            android:background="@drawable/selector_select_picture_bottom_corners"
+            android:text="@string/select_picture_select_from_album"
+            android:textColor="@color/color_333333"
+            android:textSize="@dimen/sp_17"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dp_5"
+        android:layout_marginTop="@dimen/dp_7"
+        android:background="@drawable/shape_select_picture_dialog_bg"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_43"
+            android:background="@drawable/selector_select_picture_all_corners"
+            android:text="@string/select_picture_cancel"
+            android:textColor="@color/color_333333"
+            android:textSize="@dimen/sp_17"/>
+    </LinearLayout>
+</LinearLayout>
