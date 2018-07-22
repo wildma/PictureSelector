@@ -1,8 +1,3 @@
 <resources>
     <string name="app_name">WildmaSelectPicture</string>
-
-    <!--选择图片相关-->
-    <string name="select_picture_photograph">拍照</string>
-    <string name="select_picture_select_from_album">从相册选择</string>
-    <string name="select_picture_cancel">取消</string>
 </resources>
