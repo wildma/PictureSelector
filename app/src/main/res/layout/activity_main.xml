@@ -9,11 +9,13 @@
     tools:context="com.wildma.wildmaselectpicture.MainActivity">
 
     <Button
+        android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:onClick="selectPicture"
-        android:text="select_Picture"/>
+        android:textAllCaps="false"
+        android:text="selectPicture"/>
 
     <ImageView
         android:id="@+id/iv_image"

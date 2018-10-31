@@ -46,21 +46,23 @@ public class PictureSelector {
      * 选择图片
      */
     public void selectPicture() {
-        selectPicture(200, 200, 1, 1);
+        selectPicture(true, 200, 200, 1, 1);
     }
 
     /**
      * 选择图片
      *
+     * @param cropEnabled 是否裁剪
      * @param cropWidth   裁剪宽
      * @param cropHeight  裁剪高
      * @param ratioWidth  宽比例
      * @param ratioHeight 高比例
      */
-    public void selectPicture(int cropWidth, int cropHeight, int ratioWidth, int ratioHeight) {
+    public void selectPicture(boolean cropEnabled, int cropWidth, int cropHeight, int ratioWidth, int ratioHeight) {
         Activity activity = this.mActivity.get();
         Fragment fragment = this.mFragment.get();
         Intent intent = new Intent(activity, PictureSelectActivity.class);
+        intent.putExtra(PictureSelectActivity.ENABLE_CROP, cropEnabled);
         intent.putExtra(PictureSelectActivity.CROP_WIDTH, cropWidth);
         intent.putExtra(PictureSelectActivity.CROP_HEIGHT, cropHeight);
         intent.putExtra(PictureSelectActivity.RATIO_WIDTH, ratioWidth);

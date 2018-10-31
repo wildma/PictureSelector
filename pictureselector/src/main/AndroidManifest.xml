@@ -11,6 +11,10 @@
         android:supportsRtl="true"
         >
 
+        <activity
+            android:name=".PictureSelectActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.fileProvider"

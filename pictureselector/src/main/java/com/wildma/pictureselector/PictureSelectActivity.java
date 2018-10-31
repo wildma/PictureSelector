@@ -4,14 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
-
-import java.io.File;
 
 /**
  * Author   wildma
@@ -28,16 +25,19 @@ public class PictureSelectActivity extends Activity {
     public static final String  CROP_HEIGHT  = "crop_Height";
     public static final String  RATIO_WIDTH  = "ratio_Width";
     public static final String  RATIO_HEIGHT = "ratio_Height";
-    private int mCropWidth;
-    private int mCropHeight;
-    private int mRatioWidth;
-    private int mRatioHeight;
+    public static final String  ENABLE_CROP  = "enable_crop";
+    private int     mCropWidth;
+    private int     mCropHeight;
+    private int     mRatioWidth;
+    private int     mRatioHeight;
+    private boolean mCropEnabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture_select);
 
+        mCropEnabled = getIntent().getBooleanExtra(ENABLE_CROP, true);
         mCropWidth = getIntent().getIntExtra(CROP_WIDTH, 200);
         mCropHeight = getIntent().getIntExtra(CROP_HEIGHT, 200);
         mRatioWidth = getIntent().getIntExtra(RATIO_WIDTH, 1);
@@ -110,17 +110,12 @@ public class PictureSelectActivity extends Activity {
                 finish();
             }
         }
-        Bitmap bitmap = PictureSelectUtils.onActivityResult(this, requestCode, resultCode, data, mCropWidth, mCropHeight, mRatioWidth, mRatioHeight);
-        if (bitmap != null) {
-            Uri uri = PictureSelectUtils.cropPictureTempUri;
-            File file = new File(uri.getPath());
-            if (file != null) {
-                String imagePath = file.getAbsolutePath();
-                Intent intent = new Intent();
-                intent.putExtra(PictureSelector.PICTURE_PATH, imagePath);
-                setResult(RESULT_OK, intent);
-                finish();
-            }
+        String picturePath = PictureSelectUtils.onActivityResult(this, requestCode, resultCode, data, mCropEnabled, mCropWidth, mCropHeight, mRatioWidth, mRatioHeight);
+        if (!TextUtils.isEmpty(picturePath)) {
+            Intent intent = new Intent();
+            intent.putExtra(PictureSelector.PICTURE_PATH, picturePath);
+            setResult(RESULT_OK, intent);
+            finish();
         }
     }
 }

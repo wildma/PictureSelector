@@ -29,12 +29,12 @@ public class PictureSelectUtils {
     public static final int GET_BY_ALBUM  = 0x11;//相册标记
     public static final int GET_BY_CAMERA = 0x12;//拍照标记
     public static final int CROP          = 0x13;//裁剪标记
-    private static Uri takePictureUri;//拍照图片uri
-    public static Uri cropPictureTempUri;//裁剪图片uri
+    private static Uri  takePictureUri;//拍照图片uri
+    private static Uri  cropPictureTempUri;//裁剪图片uri
+    private static File takePictureFile;//拍照图片File
 
     /**
      * 通过相册获取图片
-     * @param activity
      */
     public static void getByAlbum(Activity activity) {
         Intent intent = new Intent(Intent.ACTION_PICK,
@@ -45,7 +45,6 @@ public class PictureSelectUtils {
 
     /**
      * 通过拍照获取图片
-     * @param activity
      */
     public static void getByCamera(Activity activity) {
         takePictureUri = createImagePathUri(activity);
@@ -62,21 +61,20 @@ public class PictureSelectUtils {
      * 创建一个图片地址uri,用于保存拍照后的照片
      *
      * @param activity
-     * @return          图片的uri
+     * @return 图片的uri
      */
     public static Uri createImagePathUri(Activity activity) {
-
         try {
             FileUtils.createOrExistsDir(Constant.DIR_ROOT);
             StringBuffer buffer = new StringBuffer();
             String pathName = buffer.append(Constant.DIR_ROOT).append(Constant.APP_NAME).append(".").append(System.currentTimeMillis()).append(".jpg").toString();
-            File file = new File(pathName);
+            takePictureFile = new File(pathName);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { //解决Android 7.0 拍照出现FileUriExposedException的问题
                 String authority = activity.getPackageName() + ".fileProvider";
-                takePictureUri = FileProvider.getUriForFile(activity, authority, file);
+                takePictureUri = FileProvider.getUriForFile(activity, authority, takePictureFile);
             } else {
-                takePictureUri = Uri.fromFile(file);
+                takePictureUri = Uri.fromFile(takePictureFile);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,74 +84,68 @@ public class PictureSelectUtils {
     }
 
     /**
-     * 处理拍照或相册获取的图片，默认大小480*480，比例1:1
-     * @param activity      上下文
-     * @param requestCode   请求码
-     * @param resultCode    结果码
-     * @param data          Intent
-     * @return
-     */
-    public static Bitmap onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        return onActivityResult(activity, requestCode, resultCode, data, 0, 0, 0, 0);
-    }
-
-    /**
      * 处理拍照或相册获取的图片
-     * @param activity      上下文
-     * @param requestCode   请求码
-     * @param resultCode    结果码
-     * @param data          Intent
-     * @param w             输出宽
-     * @param h             输出高
-     * @param aspectX       宽比例
-     * @param aspectY       高比例
-     * @return
+     *
+     * @param activity    上下文
+     * @param requestCode 请求码
+     * @param resultCode  结果码
+     * @param data        Intent
+     * @param cropEnabled 是否裁剪
+     * @param w           输出宽
+     * @param h           输出高
+     * @param aspectX     宽比例
+     * @param aspectY     高比例
+     * @return picturePath 图片路径
      */
-    public static Bitmap onActivityResult(Activity activity, int requestCode, int resultCode, Intent data,
-                                          int w, int h, int aspectX, int aspectY) {
-        Bitmap bm = null;
-        if (resultCode == Activity.RESULT_OK) {
+    public static String onActivityResult(Activity activity, int requestCode, int resultCode, Intent data,
+                                          boolean cropEnabled, int w, int h, int aspectX, int aspectY) {
+        String picturePath = null;//图片路径
+        if (resultCode == activity.RESULT_OK) {
             Uri uri = null;
             switch (requestCode) {
                 case GET_BY_ALBUM:
                     uri = data.getData();
-                    activity.startActivityForResult(crop(uri, w, h, aspectX, aspectY), CROP);
+                    if (cropEnabled) {
+                        activity.startActivityForResult(crop(uri, w, h, aspectX, aspectY), CROP);
+                    } else {
+                        picturePath = ImageUtils.getImagePathFromUri(activity, uri);
+                    }
                     break;
                 case GET_BY_CAMERA:
                     uri = takePictureUri;
-                    activity.startActivityForResult(crop(uri, w, h, aspectX, aspectY), CROP);
+                    if (cropEnabled) {
+                        activity.startActivityForResult(crop(uri, w, h, aspectX, aspectY), CROP);
+                    } else {
+                        picturePath = takePictureFile.getAbsolutePath();
+                    }
+                    activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(takePictureFile)));//发送广播通知图库更新
                     break;
                 case CROP:
-                    bm = dealCrop(activity);
+                    dealCrop(activity);
+                    File file = new File(cropPictureTempUri.getPath());
+                    if (file != null) {
+                        picturePath = file.getAbsolutePath();
+                    }
                     break;
             }
         }
-        return bm;
-    }
-
-    /**
-     * 裁剪,默认裁剪输出480*480，比例1:1
-     * @param uri   图片的uri
-     * @return
-     */
-    public static Intent crop(Uri uri) {
-        return crop(uri, 480, 480, 1, 1);
+        return picturePath;
     }
 
     /**
      * 裁剪，例如：输出100*100大小的图片，宽高比例是1:1
+     *
      * @param uri     图片的uri
      * @param w       输出宽
      * @param h       输出高
      * @param aspectX 宽比例
      * @param aspectY 高比例
-     * @return
      */
     public static Intent crop(Uri uri, int w, int h, int aspectX, int aspectY) {
-        if (w == 0 && h == 0) {
+        if (w == 0 || h == 0) {
             w = h = 480;
         }
-        if (aspectX == 0 && aspectY == 0) {
+        if (aspectX == 0 || aspectY == 0) {
             aspectX = aspectY = 1;
         }
         Intent intent = new Intent("com.android.camera.action.CROP");
@@ -188,8 +180,6 @@ public class PictureSelectUtils {
 
     /**
      * 处理裁剪，获取裁剪后的图片
-     * @param context   上下文
-     * @return
      */
     public static Bitmap dealCrop(Context context) {
         Bitmap bitmap = null;

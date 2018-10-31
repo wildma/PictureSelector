@@ -27,12 +27,12 @@ public class MainActivity extends AppCompatActivity {
      */
     public void selectPicture(View view) {
         /**
-         * create方法参数一是上下文，在activity中传activity.this，在fragment中传fragment.this。参数二为请求码，用于结果回调onActivityResult中判断
-         * selectPicture方法参数分别为图片的裁剪宽、裁剪高、宽比例、高比例。默认不传则为宽200，高200，宽高比例为1：1。
+         * create()方法参数一是上下文，在activity中传activity.this，在fragment中传fragment.this。参数二为请求码，用于结果回调onActivityResult中判断
+         * selectPicture()方法参数分别为 是否裁剪、裁剪后图片的宽(单位px)、裁剪后图片的高、宽比例、高比例。都不传则默认为裁剪，宽200，高200，宽高比例为1：1。
          */
         PictureSelector
                 .create(MainActivity.this, PictureSelector.SELECT_REQUEST_CODE)
-                .selectPicture(200, 200, 1, 1);
+                .selectPicture(true, 200, 200, 1, 1);
     }
 
     @Override
