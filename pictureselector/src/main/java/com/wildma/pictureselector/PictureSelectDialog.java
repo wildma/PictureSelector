@@ -85,6 +85,7 @@ public class PictureSelectDialog extends Dialog implements View.OnClickListener 
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {  //返回键监听
+                    hideDialog();
                     mListener.onItemClick(Constant.CANCEL);//返回键关闭dialog
                 }
                 return false;
@@ -95,6 +96,7 @@ public class PictureSelectDialog extends Dialog implements View.OnClickListener 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (isOutOfBounds(getContext(), event)) {
+            hideDialog();
             mListener.onItemClick(Constant.CANCEL);//触摸dialog外部关闭dialog
         }
         return super.onTouchEvent(event);

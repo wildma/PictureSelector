@@ -97,6 +97,7 @@ public class PictureSelectActivity extends Activity {
                     PictureSelectUtils.getByAlbum(PictureSelectActivity.this);
                 } else if (type == Constant.CANCEL) {
                     finish();
+                    PictureSelectActivity.this.overridePendingTransition(0, R.anim.activity_out);//activity延迟150毫秒退出，为了执行完Dialog退出的动画
                 }
             }
         });
