@@ -63,6 +63,19 @@ compile project(':pictureselector')
     }
 ```
 
+### 注意
+如果你没有使用依赖的方式，而是直接拷贝源码到你的项目中使用。那么需要自己适配 Android 7.0 导致的 FileUriExposedException 异常，具体方式如下：
+
+将 PictureSelectUtils 中的 authority 与你项目中 AndroidManifest.xml 下的 authority 保持一致。
+例如 AndroidManifest.xml 下的 authority 为：
+```
+android:authorities="myAuthority"
+```
+则需要修改 PictureSelectUtils 中的 authority 为：
+```
+String authority = "myAuthority";
+```
+
 
 详细介绍请看文章：[一个非常好用的Android图片选择框架](https://www.jianshu.com/p/6ac6b681c413)
 
