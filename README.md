@@ -61,7 +61,7 @@ compile project(':pictureselector')
                 String picturePath = data.getStringExtra(PictureSelector.PICTURE_PATH);
                 mIvImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));
 
-                /*使用 Glide 加载图片，由于裁剪后的图片地址是相同的，所以不能从缓存中加载*/
+                /*如果使用 Glide 加载图片，则需要禁止 Glide 从缓存中加载，因为裁剪后保存的图片地址是相同的*/
                 /*RequestOptions requestOptions = RequestOptions
                         .circleCropTransform()
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
