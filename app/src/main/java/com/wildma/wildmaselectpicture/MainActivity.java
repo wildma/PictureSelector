@@ -1,12 +1,12 @@
 package com.wildma.wildmaselectpicture;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.wildma.pictureselector.ImageUtils;
 import com.wildma.pictureselector.PictureSelector;
 
 
@@ -42,7 +42,14 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == PictureSelector.SELECT_REQUEST_CODE) {
             if (data != null) {
                 String picturePath = data.getStringExtra(PictureSelector.PICTURE_PATH);
-                mIvImage.setImageBitmap(ImageUtils.getBitmap(picturePath));
+                mIvImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+
+                /*使用 Glide 加载图片，由于裁剪后的图片地址是相同的，所以不能从缓存中加载*/
+                /*RequestOptions requestOptions = RequestOptions
+                        .circleCropTransform()
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true);
+                Glide.with(this).load(picturePath).apply(requestOptions).into(mIvImage);*/
             }
         }
     }
