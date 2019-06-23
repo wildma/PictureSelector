@@ -33,12 +33,12 @@ allprojects {
 在需要使用的 module 中添加依赖
 ```
 dependencies {
-	compile 'com.github.wildma:PictureSelector:1.1.3'
+	implementation 'com.github.wildma:PictureSelector:1.1.3'
 }
 ```
 或者引用本地 lib
 ```
-compile project(':pictureselector')
+implementation project(':pictureselector')
 ```
 ##### Step 3. 拍照或者从相册选择图片
 ```
