@@ -168,8 +168,9 @@ public class PictureSelectUtils {
         intent.putExtra("scaleUpIfNeeded", true);
 
         /*解决跳转到裁剪提示“图片加载失败”问题*/
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
 
         /*解决小米miui系统调用系统裁剪图片功能camera.action.CROP后崩溃或重新打开app的问题*/
         StringBuffer buffer = new StringBuffer();
