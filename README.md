@@ -17,6 +17,7 @@ Android 图片选择器
 - 解决 7.0 调用相机 crash 问题
 - 解决小米 miui 系统调用系统裁剪图片功能 crash 问题
 - 解决华为设备裁剪框为圆形的问题
+- 适配 Android Q 版本
 
 ### 使用
 ##### Step 1. 添加 JitPack 仓库
@@ -33,12 +34,8 @@ allprojects {
 在需要使用的 module 中添加依赖
 ```
 dependencies {
-	implementation 'com.github.wildma:PictureSelector:1.1.3'
+	implementation 'com.github.wildma:PictureSelector:1.1.5'
 }
-```
-或者引用本地 lib
-```
-implementation project(':pictureselector')
 ```
 ##### Step 3. 拍照或者从相册选择图片
 ```
@@ -58,15 +55,17 @@ implementation project(':pictureselector')
         /*结果回调*/
         if (requestCode == PictureSelector.SELECT_REQUEST_CODE) {
             if (data != null) {
-                String picturePath = data.getStringExtra(PictureSelector.PICTURE_PATH);
-                mIvImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+                PictureBean pictureBean = data.getParcelableExtra(PictureSelector.PICTURE_RESULT);
+                if (pictureBean.isCut()) {
+                    mIvImage.setImageBitmap(BitmapFactory.decodeFile(pictureBean.getPath()));
+                } else {
+                    mIvImage.setImageURI(pictureBean.getUri());
+                }
 
-                /*如果使用 Glide 加载图片，则需要禁止 Glide 从缓存中加载，因为裁剪后保存的图片地址是相同的*/
-                /*RequestOptions requestOptions = RequestOptions
-                        .circleCropTransform()
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .skipMemoryCache(true);
-                Glide.with(this).load(picturePath).apply(requestOptions).into(mIvImage);*/
+                //使用 Glide 加载图片
+                /*Glide.with(this)
+                        .load(pictureBean.isCut() ? pictureBean.getPath() : pictureBean.getUri())
+                        .apply(RequestOptions.centerCropTransform()).into(mIvImage);*/
             }
         }
     }
