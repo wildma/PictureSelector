@@ -4,11 +4,15 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.io.File;
 
 /**
  * Author   wildma
@@ -113,8 +117,17 @@ public class PictureSelectActivity extends Activity {
         }
         String picturePath = PictureSelectUtils.onActivityResult(this, requestCode, resultCode, data, mCropEnabled, mCropWidth, mCropHeight, mRatioWidth, mRatioHeight);
         if (!TextUtils.isEmpty(picturePath)) {
+            PictureBean bean = new PictureBean();
+            bean.setPath(picturePath);
+            bean.setCut(mCropEnabled);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                bean.setUri(ImageUtils.getImageUri(this, picturePath));
+            } else {
+                bean.setUri(Uri.fromFile(new File(picturePath)));
+            }
+
             Intent intent = new Intent();
-            intent.putExtra(PictureSelector.PICTURE_PATH, picturePath);
+            intent.putExtra(PictureSelector.PICTURE_RESULT, bean);
             setResult(RESULT_OK, intent);
             finish();
         }

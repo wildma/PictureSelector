@@ -4,14 +4,17 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.wildma.pictureselector.PictureBean;
 import com.wildma.pictureselector.PictureSelector;
 
 
 public class MainActivity extends AppCompatActivity {
-    private ImageView mIvImage;
+    public static final String    TAG = "PictureSelector";
+    private             ImageView mIvImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,15 +44,20 @@ public class MainActivity extends AppCompatActivity {
         /*结果回调*/
         if (requestCode == PictureSelector.SELECT_REQUEST_CODE) {
             if (data != null) {
-                String picturePath = data.getStringExtra(PictureSelector.PICTURE_PATH);
-                mIvImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+                PictureBean pictureBean = data.getParcelableExtra(PictureSelector.PICTURE_RESULT);
+                Log.i(TAG, "是否裁剪: " + pictureBean.isCut());
+                Log.i(TAG, "原图地址: " + pictureBean.getPath());
+                Log.i(TAG, "图片 Uri: " + pictureBean.getUri());
+                if (pictureBean.isCut()) {
+                    mIvImage.setImageBitmap(BitmapFactory.decodeFile(pictureBean.getPath()));
+                } else {
+                    mIvImage.setImageURI(pictureBean.getUri());
+                }
 
-                /*使用 Glide 加载图片，由于裁剪后的图片地址是相同的，所以不能从缓存中加载*/
-                /*RequestOptions requestOptions = RequestOptions
-                        .circleCropTransform()
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .skipMemoryCache(true);
-                Glide.with(this).load(picturePath).apply(requestOptions).into(mIvImage);*/
+                //使用 Glide 加载图片
+                /*Glide.with(this)
+                        .load(pictureBean.isCut() ? pictureBean.getPath() : pictureBean.getUri())
+                        .apply(RequestOptions.centerCropTransform()).into(mIvImage);*/
             }
         }
     }

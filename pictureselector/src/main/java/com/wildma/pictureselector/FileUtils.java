@@ -1,5 +1,7 @@
 package com.wildma.pictureselector;
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 
 import java.io.File;
@@ -23,6 +25,39 @@ public final class FileUtils {
             path = Environment.getDataDirectory();//内部存储的根目录    /data
         }
         return path;
+    }
+
+    /**
+     * 获取图片目录
+     *
+     * @return 图片目录（/storage/emulated/0/Pictures）
+     */
+    public static File getExtPicturesPath() {
+        File extPicturesPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        if (!extPicturesPath.exists()) {
+            extPicturesPath.mkdir();
+        }
+        return extPicturesPath;
+    }
+
+    /**
+     * 获取缓存图片的目录
+     *
+     * @param context Context
+     * @return 缓存图片的目录
+     */
+    public static String getImageCacheDir(Context context) {
+        String cachePath;
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                cachePath = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath();
+            } else {
+                cachePath = context.getExternalCacheDir().getPath();
+            }
+        } else {
+            cachePath = context.getCacheDir().getPath();
+        }
+        return cachePath;
     }
 
     /**

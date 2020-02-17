@@ -1,12 +1,14 @@
 package com.wildma.pictureselector;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.widget.Toast;
@@ -26,12 +28,12 @@ import java.io.FileNotFoundException;
  */
 public class PictureSelectUtils {
 
-    public static final int GET_BY_ALBUM  = 0x11;//相册标记
-    public static final int GET_BY_CAMERA = 0x12;//拍照标记
-    public static final int CROP          = 0x13;//裁剪标记
-    private static Uri  takePictureUri;//拍照图片uri
-    private static Uri  cropPictureTempUri;//裁剪图片uri
-    private static File takePictureFile;//拍照图片File
+    public static final int  GET_BY_ALBUM  = 0x11;//相册标记
+    public static final int  GET_BY_CAMERA = 0x12;//拍照标记
+    public static final int  CROP          = 0x13;//裁剪标记
+    private static      Uri  takePictureUri;//拍照图片uri
+    private static      Uri  cropPictureTempUri;//裁剪图片uri
+    private static      File takePictureFile;//拍照图片File
 
     /**
      * 通过相册获取图片
@@ -53,7 +55,7 @@ public class PictureSelectUtils {
             i.putExtra(MediaStore.EXTRA_OUTPUT, takePictureUri);//输出路径（拍照后的保存路径）
             activity.startActivityForResult(i, GET_BY_CAMERA);
         } else {
-            Toast.makeText(activity, "无法保存到相册", Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, "打开相机失败", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -64,10 +66,19 @@ public class PictureSelectUtils {
      * @return 图片的uri
      */
     public static Uri createImagePathUri(Activity activity) {
-        try {
-            FileUtils.createOrExistsDir(Constant.DIR_ROOT);
-            StringBuffer buffer = new StringBuffer();
-            String pathName = buffer.append(Constant.DIR_ROOT).append(Constant.APP_NAME).append(".").append(System.currentTimeMillis()).append(".jpg").toString();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { //适配 Android Q
+            String displayName = String.valueOf(System.currentTimeMillis());
+            ContentValues values = new ContentValues(2);
+            values.put(MediaStore.Images.Media.DISPLAY_NAME, displayName);
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) { //SD 卡是否可用，可用则用 SD 卡，否则用内部存储
+                takePictureUri = activity.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            } else {
+                takePictureUri = activity.getContentResolver().insert(MediaStore.Images.Media.INTERNAL_CONTENT_URI, values);
+            }
+        } else {
+            String pathName = new StringBuffer().append(FileUtils.getExtPicturesPath()).append(File.separator)
+                    .append(System.currentTimeMillis()).append(".jpg").toString();
             takePictureFile = new File(pathName);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { //解决Android 7.0 拍照出现FileUriExposedException的问题
@@ -76,9 +87,6 @@ public class PictureSelectUtils {
             } else {
                 takePictureUri = Uri.fromFile(takePictureFile);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(activity, "无法保存到相册", Toast.LENGTH_LONG).show();
         }
         return takePictureUri;
     }
@@ -106,19 +114,26 @@ public class PictureSelectUtils {
                 case GET_BY_ALBUM:
                     uri = data.getData();
                     if (cropEnabled) {
-                        activity.startActivityForResult(crop(uri, w, h, aspectX, aspectY), CROP);
+                        activity.startActivityForResult(crop(activity, uri, w, h, aspectX, aspectY), CROP);
                     } else {
-                        picturePath = ImageUtils.getImagePathFromUri(activity, uri);
+                        picturePath = ImageUtils.getImagePath(activity, uri);
                     }
                     break;
                 case GET_BY_CAMERA:
                     uri = takePictureUri;
                     if (cropEnabled) {
-                        activity.startActivityForResult(crop(uri, w, h, aspectX, aspectY), CROP);
+                        activity.startActivityForResult(crop(activity, uri, w, h, aspectX, aspectY), CROP);
                     } else {
-                        picturePath = takePictureFile.getAbsolutePath();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            picturePath = ImageUtils.getImagePath(activity, uri);
+                        } else {
+                            picturePath = takePictureFile.getAbsolutePath();
+                        }
                     }
-                    activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(takePictureFile)));//发送广播通知图库更新
+                    /*Android Q 以下发送广播通知图库更新，Android Q 以上使用 insert 的方式则会自动更新*/
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                        activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(takePictureFile)));
+                    }
                     break;
                 case CROP:
                     dealCrop(activity);
@@ -135,13 +150,14 @@ public class PictureSelectUtils {
     /**
      * 裁剪，例如：输出100*100大小的图片，宽高比例是1:1
      *
-     * @param uri     图片的uri
-     * @param w       输出宽
-     * @param h       输出高
-     * @param aspectX 宽比例
-     * @param aspectY 高比例
+     * @param activity Activity
+     * @param uri      图片的uri
+     * @param w        输出宽
+     * @param h        输出高
+     * @param aspectX  宽比例
+     * @param aspectY  高比例
      */
-    public static Intent crop(Uri uri, int w, int h, int aspectX, int aspectY) {
+    public static Intent crop(Activity activity, Uri uri, int w, int h, int aspectX, int aspectY) {
         if (w == 0 || h == 0) {
             w = h = 480;
         }
@@ -173,8 +189,8 @@ public class PictureSelectUtils {
         }
 
         /*解决小米miui系统调用系统裁剪图片功能camera.action.CROP后崩溃或重新打开app的问题*/
-        StringBuffer buffer = new StringBuffer();
-        String pathName = buffer.append("file:///").append(FileUtils.getRootPath()).append(File.separator).append(Constant.APP_NAME).append(".temp.jpg").toString();
+        String pathName = new StringBuffer().append("file:///").append(FileUtils.getImageCacheDir(activity)).append(File.separator)
+                .append(System.currentTimeMillis()).append(".jpg").toString();
         cropPictureTempUri = Uri.parse(pathName);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, cropPictureTempUri);//输出路径(裁剪后的保存路径)
         // 输出格式

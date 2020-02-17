@@ -1,11 +1,14 @@
 package com.wildma.pictureselector;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
+
+import java.io.File;
 
 /**
  * Author   wildma
@@ -40,13 +43,13 @@ public class ImageUtils {
     }
 
     /**
-     * 从Uri中获取图片路劲
+     * 获取图片路径
      *
-     * @param context
-     * @param uri     图片Uri
-     * @return
+     * @param context Context
+     * @param uri     图片 Uri
+     * @return 图片路径
      */
-    public static String getImagePathFromUri(Context context, Uri uri) {
+    public static String getImagePath(Context context, Uri uri) {
         Cursor cursor = null;
         try {
             String[] proj = {MediaStore.Images.Media.DATA};
@@ -57,6 +60,32 @@ public class ImageUtils {
         } finally {
             if (cursor != null) {
                 cursor.close();
+            }
+        }
+    }
+
+    /**
+     * 获取图片 Uri
+     *
+     * @param context Context
+     * @param path    图片路径
+     * @return 图片 Uri
+     */
+    public static Uri getImageUri(Context context, String path) {
+        Cursor cursor = context.getContentResolver().query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Images.Media._ID},
+                MediaStore.Images.Media.DATA + "=? ", new String[]{path}, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
+            Uri baseUri = Uri.parse("content://media/external/images/media");
+            return Uri.withAppendedPath(baseUri, "" + id);
+        } else {
+            if (new File(path).exists()) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DATA, path);
+                return context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            } else {
+                return null;
             }
         }
     }
