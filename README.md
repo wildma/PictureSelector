@@ -25,7 +25,6 @@ Android 图片选择器
 ```java
 allprojects {
     repositories {
-        ...
         maven { url "https://jitpack.io" }
     }
 }
