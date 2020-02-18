@@ -22,7 +22,7 @@ Android 图片选择器
 ### 使用
 ##### Step 1. 添加 JitPack 仓库
 在项目的 build.gradle 添加 JitPack 仓库
-```
+```java
 allprojects {
     repositories {
         ...
@@ -31,14 +31,15 @@ allprojects {
 }
 ```
 ##### Step 2. 添加依赖
-在需要使用的 module 中添加依赖
-```
+在需要使用的 module 中添加依赖  
+注意：从 2.0.0 版本开始，项目迁移到 AndroidX。如果你的项目还未迁移到 AndroidX，可以使用 1.1.6 版本。
+```java
 dependencies {
-	implementation 'com.github.wildma:PictureSelector:1.1.5'
+	implementation 'com.github.wildma:PictureSelector:2.0.0'
 }
 ```
 ##### Step 3. 拍照或者从相册选择图片
-```
+```java
         /**
          * create() 方法参数一是上下文，在 activity 中传 activity.this，在 fragment 中传 fragment.this。参数二为请求码，用于结果回调 onActivityResult 中判断
          * selectPicture() 方法参数分别为 是否裁剪、裁剪后图片的宽(单位 px)、裁剪后图片的高、宽比例、高比例。都不传则默认为裁剪，宽 200，高 200，宽高比例为 1：1。
@@ -48,7 +49,7 @@ dependencies {
                 .selectPicture(true, 200, 200, 1, 1);
 ```
 ##### Step 4. 获取图片地址进行显示
-```
+```java
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -71,16 +72,22 @@ dependencies {
     }
 ```
 
+##### 清理缓存
+实际开发中将图片上传到服务器成功后需要删除全部缓存图片（即裁剪后的无用图片）调用如下方法即可：
+```java
+    FileUtils.deleteAllCacheImage(this);
+```
+
 ### 注意
 如果你没有使用依赖的方式，而是直接拷贝源码到你的项目中使用。那么需要自己适配 Android 7.0 导致的 FileUriExposedException 异常，具体方式如下：
 
 将 PictureSelectUtils 中的 authority 与你项目中 AndroidManifest.xml 下的 authority 保持一致。
 例如 AndroidManifest.xml 下的 authority 为：
-```
+```java
 android:authorities="myAuthority"
 ```
 则需要修改 PictureSelectUtils 中的 authority（ [这一行](https://github.com/wildma/PictureSelector/blob/master/pictureselector/src/main/java/com/wildma/pictureselector/PictureSelectUtils.java#L74)） 为：
-```
+```java
 String authority = "myAuthority";
 ```
 
