@@ -3,13 +3,14 @@ package com.wildma.wildmaselectpicture;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.wildma.pictureselector.PictureBean;
 import com.wildma.pictureselector.PictureSelector;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 
 public class MainActivity extends AppCompatActivity {
