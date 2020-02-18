@@ -58,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
                 /*Glide.with(this)
                         .load(pictureBean.isCut() ? pictureBean.getPath() : pictureBean.getUri())
                         .apply(RequestOptions.centerCropTransform()).into(mIvImage);*/
+
+                //实际开发中将图片上传到服务器成功后需要删除全部缓存图片（即裁剪后的无用图片）
+                //FileUtils.deleteAllCacheImage(this);
             }
         }
     }

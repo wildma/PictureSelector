@@ -1,7 +1,6 @@
 package com.wildma.pictureselector;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Environment;
 
 import java.io.File;
@@ -48,16 +47,30 @@ public final class FileUtils {
      */
     public static String getImageCacheDir(Context context) {
         String cachePath;
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                cachePath = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath();
-            } else {
-                cachePath = context.getExternalCacheDir().getPath();
-            }
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            cachePath = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath();
         } else {
             cachePath = context.getCacheDir().getPath();
         }
         return cachePath;
+    }
+
+    /**
+     * 删除缓存图片目录中的全部图片
+     *
+     * @param context
+     */
+    public static void deleteAllCacheImage(Context context) {
+        String cacheImagePath = getImageCacheDir(context);
+        File cacheImageDir = new File(cacheImagePath);
+        File[] files = cacheImageDir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    file.delete();
+                }
+            }
+        }
     }
 
     /**
