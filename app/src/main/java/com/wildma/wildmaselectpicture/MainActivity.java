@@ -24,15 +24,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 选择图片按钮点击事件
-     *
-     * @param view
+     * 不裁剪
      */
     public void selectPicture(View view) {
-        /**
-         * create()方法参数一是上下文，在activity中传activity.this，在fragment中传fragment.this。参数二为请求码，用于结果回调onActivityResult中判断
-         * selectPicture()方法参数分别为 是否裁剪、裁剪后图片的宽(单位px)、裁剪后图片的高、宽比例、高比例。都不传则默认为裁剪，宽200，高200，宽高比例为1：1。
-         */
+        PictureSelector
+                .create(MainActivity.this, PictureSelector.SELECT_REQUEST_CODE)
+                .selectPicture(false);
+    }
+
+    /**
+     * 自由裁剪
+     */
+    public void selectPicture2(View view) {
+        PictureSelector
+                .create(MainActivity.this, PictureSelector.SELECT_REQUEST_CODE)
+                .selectPicture(true);
+    }
+
+    /**
+     * 指定宽高及宽高比例裁剪
+     */
+    public void selectPicture3(View view) {
         PictureSelector
                 .create(MainActivity.this, PictureSelector.SELECT_REQUEST_CODE)
                 .selectPicture(true, 200, 200, 1, 1);

@@ -158,26 +158,24 @@ public class PictureSelectUtils {
      * @param aspectY  高比例
      */
     public static Intent crop(Activity activity, Uri uri, int w, int h, int aspectX, int aspectY) {
-        if (w == 0 || h == 0) {
-            w = h = 480;
-        }
-        if (aspectX == 0 || aspectY == 0) {
-            aspectX = aspectY = 1;
-        }
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");
         intent.putExtra("crop", "true");
-        if (aspectX == aspectY) {
+        if (aspectX != 0 && aspectX == aspectY) {
             /*宽高比例相同时，华为设备的系统默认裁剪框是圆形的，这里统一改成方形的*/
             if (Build.MANUFACTURER.equals("HUAWEI")) {
                 aspectX = 9998;
                 aspectY = 9999;
             }
         }
-        intent.putExtra("aspectX", aspectX);
-        intent.putExtra("aspectY", aspectY);
-        intent.putExtra("outputX", w);
-        intent.putExtra("outputY", h);
+        if (w != 0 && h != 0) {
+            intent.putExtra("outputX", w);
+            intent.putExtra("outputY", h);
+        }
+        if (aspectX != 0 || aspectY != 0) {
+            intent.putExtra("aspectX", aspectX);
+            intent.putExtra("aspectY", aspectY);
+        }
 
         /*解决图片有黑边问题*/
         intent.putExtra("scale", true);

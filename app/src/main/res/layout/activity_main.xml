@@ -9,19 +9,36 @@
     tools:context="com.wildma.wildmaselectpicture.MainActivity">
 
     <Button
-        android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:onClick="selectPicture"
-        android:textAllCaps="false"
-        android:text="selectPicture"/>
+        android:text="不裁剪"
+        android:textAllCaps="false"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:onClick="selectPicture2"
+        android:text="自由裁剪"
+        android:textAllCaps="false"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:onClick="selectPicture3"
+        android:text="指定宽高及宽高比例裁剪"
+        android:textAllCaps="false"/>
 
     <ImageView
         android:id="@+id/iv_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:src="@mipmap/ic_launcher"/>
 
 </LinearLayout>
