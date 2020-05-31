@@ -85,7 +85,7 @@ dependencies {
 ```java
 android:authorities="myAuthority"
 ```
-则需要修改 PictureSelectUtils 中的 authority（ [这一行](https://github.com/wildma/PictureSelector/blob/master/pictureselector/src/main/java/com/wildma/pictureselector/PictureSelectUtils.java#L74)） 为：
+则需要修改 PictureSelectUtils 中的 authority（ [这一行](https://github.com/wildma/PictureSelector/blob/master/pictureselector/src/main/java/com/wildma/pictureselector/PictureSelectUtils.java#L85)） 为：
 ```java
 String authority = "myAuthority";
 ```
