@@ -2,9 +2,10 @@ package com.wildma.pictureselector;
 
 import android.app.Activity;
 import android.content.Intent;
-import androidx.fragment.app.Fragment;
 
 import java.lang.ref.WeakReference;
+
+import androidx.fragment.app.Fragment;
 
 /**
  * Author       wildma
@@ -14,16 +15,30 @@ import java.lang.ref.WeakReference;
  */
 public class PictureSelector {
 
-    public static final int               SELECT_REQUEST_CODE = 0x15;//选择图片请求码
-    public static final String            PICTURE_RESULT      = "picture_result";//选择的图片结果
-    private       int                     mRequestCode;
-    private final WeakReference<Activity> mActivity;
-    private final WeakReference<Fragment> mFragment;
+    public static final int                     SELECT_REQUEST_CODE = 0x15;//选择图片请求码
+    public static final String                  PICTURE_RESULT      = "picture_result";//选择的图片结果
+    private             int                     mRequestCode;
+    private final       WeakReference<Activity> mActivity;
+    private final       WeakReference<Fragment> mFragment;
 
+    /**
+     * 创建 PictureSelector（用于 Activity）
+     *
+     * @param activity    Activity
+     * @param requestCode 请求码，用于结果回调 onActivityResult() 中判断
+     * @return PictureSelector
+     */
     public static PictureSelector create(Activity activity, int requestCode) {
         return new PictureSelector(activity, requestCode);
     }
 
+    /**
+     * 创建 PictureSelector（用于 Fragment）
+     *
+     * @param fragment    Fragment
+     * @param requestCode 请求码，用于结果回调 onActivityResult() 中判断
+     * @return PictureSelector
+     */
     public static PictureSelector create(Fragment fragment, int requestCode) {
         return new PictureSelector(fragment, requestCode);
     }
@@ -43,14 +58,23 @@ public class PictureSelector {
     }
 
     /**
-     * 选择图片
+     * 选择图片（默认不裁剪）
      */
     public void selectPicture() {
-        selectPicture(true, 200, 200, 1, 1);
+        selectPicture(false, 0, 0, 0, 0);
     }
 
     /**
-     * 选择图片
+     * 选择图片（根据参数决定是否裁剪）
+     *
+     * @param cropEnabled 是否裁剪
+     */
+    public void selectPicture(boolean cropEnabled) {
+        selectPicture(cropEnabled, 0, 0, 0, 0);
+    }
+
+    /**
+     * 选择图片（指定宽高及宽高比例裁剪）
      *
      * @param cropEnabled 是否裁剪
      * @param cropWidth   裁剪宽
