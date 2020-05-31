@@ -167,8 +167,8 @@ public class PictureSelectUtils {
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");
         intent.putExtra("crop", "true");
-        if (aspectX / aspectY == 1) {
-            /*宽高比例为 1:1 时，华为设备的系统默认裁剪框是圆形的，这里统一改成方形的*/
+        if (aspectX == aspectY) {
+            /*宽高比例相同时，华为设备的系统默认裁剪框是圆形的，这里统一改成方形的*/
             if (Build.MANUFACTURER.equals("HUAWEI")) {
                 aspectX = 9998;
                 aspectY = 9999;
