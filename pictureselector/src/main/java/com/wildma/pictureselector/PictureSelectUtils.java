@@ -10,12 +10,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Toast;
+
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-
-import androidx.core.content.FileProvider;
+import java.io.IOException;
+import java.io.OutputStream;
 
 
 /**
@@ -188,9 +191,14 @@ public class PictureSelectUtils {
         }
 
         /*解决小米miui系统调用系统裁剪图片功能camera.action.CROP后崩溃或重新打开app的问题*/
-        String pathName = new StringBuffer().append("file:///").append(FileUtils.getImageCacheDir(activity)).append(File.separator)
-                .append(System.currentTimeMillis()).append(".jpg").toString();
-        cropPictureTempUri = Uri.parse(pathName);
+        String filename = File.separator + System.currentTimeMillis() + ".jpg";
+        File outputFile = new File(Build.VERSION.SDK_INT >= 30 ? FileUtils.getExtPicturesPath().getPath() : FileUtils.getImageCacheDir(activity), filename);
+        Uri outputPictureUri = Uri.parse("file:///" + outputFile);
+        if(!checkOutputPictureUri(activity, outputPictureUri)){
+            Log.e("PictureSelectUtils", "#### 读取输出图片URI失败 ####");
+        }
+
+        cropPictureTempUri = outputPictureUri;
         intent.putExtra(MediaStore.EXTRA_OUTPUT, cropPictureTempUri);//输出路径(裁剪后的保存路径)
         // 输出格式
         intent.putExtra("outputFormat", "JPEG");
@@ -212,6 +220,31 @@ public class PictureSelectUtils {
             e.printStackTrace();
         }
         return bitmap;
+    }
+
+    /**
+     * 检查输出图片的uri是否可以能正常打开
+     * @param context
+     * @param uri
+     * @return
+     */
+    private static boolean checkOutputPictureUri(Context context, Uri uri){
+        OutputStream openOutputStream = null;
+        try {
+            openOutputStream = context.getContentResolver().openOutputStream(uri);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if(openOutputStream != null){
+                try {
+                    openOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return true;
     }
 
 }
